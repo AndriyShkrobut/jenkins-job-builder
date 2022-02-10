@@ -3,9 +3,7 @@ pipeline {
 
 	stages {
 		stage('Custom Stage') {
-			steps {
-				sh 'ls -l'
-			}
+			steps { sh 'ls -l' }
 		}
 	}
 }
