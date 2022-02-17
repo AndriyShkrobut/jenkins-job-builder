@@ -34,11 +34,7 @@ pipeline {
         }
         
         stage('Build for Python 3.7') {
-            agent {
-                docker {
-                    image 'ochirkov/jenkins_classes:py37'
-                }
-            }
+            agent { docker 'ochirkov/jenkins_classes:py37' }
 
             steps {
                 echo "${env.GREEN}Build for Python 3.7${env.END}"
@@ -47,16 +43,46 @@ pipeline {
         }
 
         stage('Build for Python 3.8') {
-            agent {
-                docker {
-                    image 'ochirkov/jenkins_classes:py38'
-                }
-            }
+            agent { docker 'ochirkov/jenkins_classes:py38' }
 
             steps {
                 echo "${env.GREEN}Build for Python 3.8${env.END}"
                 sh 'tox -e py38'
             }
         }
+
+        stage('Build Coverage') {
+            agent { docker 'ochirkov/jenkins_classes:py38' }
+
+            steps {
+                echo "${env.GREEN}Build Coverage${env.END}"
+                sh 'tox -e cover'
+            }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts(
+                artifacts: 'doc/build/html/*.html',
+                followSymlinks: false
+            )
+
+            cobertura(
+                autoUpdateHealth: false,
+                autoUpdateStability: false,
+                coberturaReportFile: "${env.COBERTURA_REPORT}",
+                conditionalCoverageTargets: '70, 0, 0',
+                failUnhealthy: false,
+                failUnstable: false,
+                lineCoverageTargets: '80, 0, 0',
+                maxNumberOfBuilds: 0,
+                methodCoverageTargets: '80, 0, 0',
+                onlyStable: false,
+                sourceEncoding: 'ASCII',
+                zoomCoverageChart: false
+            )
+        }
+
     }
 }
