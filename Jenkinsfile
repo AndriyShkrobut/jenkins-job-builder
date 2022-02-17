@@ -45,17 +45,10 @@ pipeline {
                 sh 'tox -e cover'
             }
         }
-
-        stage('Build for Python 2.7') {
+        
+	stage('Build for Python 3.8') {
             steps {
-                echo "${env.GREEN}Build for Python 2.7${env.END}"
-                sh 'tox -e py27'
-            }
-        }
-
-        stage('Build for Python 3.7') {
-            steps {
-                echo "${env.GREEN}Build for Python 3.7${env.END}"
+                echo "${env.GREEN}Build for Python 3.8${env.END}"
                 sh 'tox -e py38'
             }
         }
