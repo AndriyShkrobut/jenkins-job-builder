@@ -1,4 +1,8 @@
 pipeline {
+    agent {
+        label 'built-in'
+    }
+
     environment {
         BLACK='\u001b[30m'
         RED='\u001b[31m'
@@ -15,10 +19,6 @@ pipeline {
 
     stages {
         stage('Checkout') {
-            agent {
-                label 'built-in'
-            }
-
             steps {
                 echo "${env.GREEN}Checking out Jenkins Job Builder repository${env.END}"
                 checkout(
