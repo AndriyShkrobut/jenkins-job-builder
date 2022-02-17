@@ -1,6 +1,8 @@
 pipeline {
     agent {
-        label 'built-in'
+        docker {
+            image 'ochirkov/jenkins_classes:py37'
+        }
     }
 
     environment {
@@ -36,12 +38,6 @@ pipeline {
         }
 
         stage('Build Docs') {
-            agent {
-                dockerfile {
-                    filename 'Dockerfile'
-                }
-            }
-
             steps {
                 echo "${env.GREEN}Build Docs${env.END}"
                 sh 'tox -e docs'
@@ -49,12 +45,6 @@ pipeline {
         }
 
         stage('Build Coverage') {
-            agent {
-                dockerfile {
-                        filename 'Dockerfile'
-                }
-            }
-
             steps {
                 echo "${env.GREEN}Build Coverage${env.END}"
                 sh 'tox -e cover'
@@ -62,15 +52,22 @@ pipeline {
         }
         
         stage('Build for Python 3.7') {
+            steps {
+                echo "${env.GREEN}Build for Python 3.7${env.END}"
+                sh 'tox -e py37'
+            }
+        }
+
+        stage('Build for Python 3.8') {
             agent {
                 docker {
-                    image 'ochirkov/jenkins_classes:py37'
+                    image 'ochirkov/jenkins_classes:py38'
                 }
             }
 
             steps {
-                echo "${env.GREEN}Build for Python 3.7${env.END}"
-                sh 'tox -e py37'
+                echo "${env.GREEN}Build for Python 3.8${env.END}"
+                sh 'tox -e py38'
             }
         }
     }
