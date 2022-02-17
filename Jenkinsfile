@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'ochirkov/jenkins_classes:py37'
+            image 'ochirkov/jenkins_classes:py38'
         }
     }
 
@@ -61,7 +61,7 @@ pipeline {
         stage('Build for Python 3.8') {
             agent {
                 docker {
-                    image 'ochirkov/jenkins_classes:py38'
+                    image 'ochirkov/jenkins_classes:py37'
                 }
             }
 
