@@ -1,9 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'ochirkov/jenkins_classes:py38'
-        }
-    }
+    agent any
 
     environment {
         BLACK='\u001b[30m'
@@ -36,22 +32,14 @@ pipeline {
                 )
             }
         }
-
-        stage('Build Docs') {
-            steps {
-                echo "${env.GREEN}Build Docs${env.END}"
-                sh 'tox -e docs'
-            }
-        }
-
-        stage('Build Coverage') {
-            steps {
-                echo "${env.GREEN}Build Coverage${env.END}"
-                sh 'tox -e cover'
-            }
-        }
         
         stage('Build for Python 3.7') {
+            agent {
+                docker {
+                    image 'ochirkov/jenkins_classes:py37'
+                }
+            }
+
             steps {
                 echo "${env.GREEN}Build for Python 3.7${env.END}"
                 sh 'tox -e py37'
@@ -61,7 +49,7 @@ pipeline {
         stage('Build for Python 3.8') {
             agent {
                 docker {
-                    image 'ochirkov/jenkins_classes:py37'
+                    image 'ochirkov/jenkins_classes:py38'
                 }
             }
 
@@ -70,30 +58,5 @@ pipeline {
                 sh 'tox -e py38'
             }
         }
-    }
-
-    post {
-        always {
-            archiveArtifacts(
-                artifacts: 'doc/build/html/*.html',
-                followSymlinks: false
-            )
-
-            cobertura(
-                autoUpdateHealth: false,
-                autoUpdateStability: false,
-                coberturaReportFile: "${env.COBERTURA_REPORT}",
-                conditionalCoverageTargets: '70, 0, 0',
-                failUnhealthy: false,
-                failUnstable: false,
-                lineCoverageTargets: '80, 0, 0',
-                maxNumberOfBuilds: 0,
-                methodCoverageTargets: '80, 0, 0',
-                onlyStable: false,
-                sourceEncoding: 'ASCII',
-                zoomCoverageChart: false
-            )
-        }
-
     }
 }
