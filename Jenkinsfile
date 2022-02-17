@@ -1,17 +1,11 @@
 pipeline {
-    agent {
-	dockerfile {
-            filename 'Dockerfile'
-        }
-    }
-
     environment {
         BLACK='\u001b[30m'
         RED='\u001b[31m'
         GREEN='\u001b[32m'
         END='\033[0m'
         REPOSITORY_URL='https://github.com/AndriyShkrobut/jenkins-job-builder.git'
-	COBERTURA_REPORT='cover/coverage.xml'
+        COBERTURA_REPORT='cover/coverage.xml'
     }
 
     options {
@@ -21,6 +15,10 @@ pipeline {
 
     stages {
         stage('Checkout') {
+            agent {
+                label 'built-in'
+            }
+
             steps {
                 echo "${env.GREEN}Checking out Jenkins Job Builder repository${env.END}"
                 checkout(
@@ -38,6 +36,12 @@ pipeline {
         }
 
         stage('Build Docs') {
+            agent {
+                dockerfile {
+                    filename 'Dockerfile'
+                }
+            }
+
             steps {
                 echo "${env.GREEN}Build Docs${env.END}"
                 sh 'tox -e docs'
@@ -45,13 +49,25 @@ pipeline {
         }
 
         stage('Build Coverage') {
+            agent {
+                dockerfile {
+                        filename 'Dockerfile'
+                }
+            }
+
             steps {
                 echo "${env.GREEN}Build Coverage${env.END}"
                 sh 'tox -e cover'
             }
         }
         
-	stage('Build for Python 3.7') {
+        stage('Build for Python 3.7') {
+            agent {
+                docker {
+                    image 'ochirkov/jenkins_classes:py37'
+                }
+            }
+
             steps {
                 echo "${env.GREEN}Build for Python 3.7${env.END}"
                 sh 'tox -e py37'
@@ -60,7 +76,7 @@ pipeline {
     }
 
     post {
-	always {
+        always {
             archiveArtifacts(
                 artifacts: 'doc/build/html/*.html',
                 followSymlinks: false
