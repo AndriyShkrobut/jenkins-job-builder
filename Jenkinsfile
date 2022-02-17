@@ -1,5 +1,9 @@
 pipeline {
-    agent { label 'built-in' }
+    agent {
+	dockerfile {
+            filename 'Dockerfile'
+        }
+    }
 
     environment {
         BLACK='\u001b[30m'
@@ -47,10 +51,10 @@ pipeline {
             }
         }
         
-	stage('Build for Python 3.8') {
+	stage('Build for Python 3.7') {
             steps {
-                echo "${env.GREEN}Build for Python 3.8${env.END}"
-                sh 'tox -e py38'
+                echo "${env.GREEN}Build for Python 3.7${env.END}"
+                sh 'tox -e py37'
             }
         }
     }
